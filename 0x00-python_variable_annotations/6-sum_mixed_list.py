@@ -3,10 +3,10 @@
 This module provides a function for summing a
     mixed list of integers and floats.
 """
-from typing import Union
+from typing import Union, List
 
 
-def sum_mixed_list(mxd_lst: Union[int, float]) -> float:
+def sum_mixed_list(mxd_lst: List[Union[int, float]]) -> float:
     """
     Calculate the sum of a mixed list of integers and floats.
 
@@ -17,4 +17,4 @@ def sum_mixed_list(mxd_lst: Union[int, float]) -> float:
         The sum of the elements in the list.
 
     """
-    return sum(mxd_lst)
+    return float(sum(mxd_lst))
