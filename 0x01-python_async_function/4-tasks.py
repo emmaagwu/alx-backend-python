@@ -7,7 +7,7 @@ import importlib
 import asyncio
 
 
-task_random = importlib.import_module('0-basic_async_syntax').task_wait_random
+task_random_random = importlib.import_module("3-tasks").task_wait_random
 
 
 async def task_wait_n(n: int, max_delay: int) -> List[float]:
@@ -23,6 +23,6 @@ async def task_wait_n(n: int, max_delay: int) -> List[float]:
         List: A sorted list of the delays.
     """
     delay_list = await asyncio.gather(
-        *tuple(map(lambda _: task_random(max_delay), range(n)))
+        *tuple(map(lambda _: task_random_random(max_delay), range(n)))
     )
     return sorted(delay_list)
