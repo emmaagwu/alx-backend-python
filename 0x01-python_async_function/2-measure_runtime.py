@@ -1,4 +1,4 @@
-#!/bin/bash/env python3
+#!/usr/bash/env python3
 """
 Returns the runtime of the function
 """
