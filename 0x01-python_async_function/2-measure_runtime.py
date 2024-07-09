@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-import time
-import importlib
-import asyncio
-
 """
 Returns the runtime of the function
 """
+import time
+import importlib
+import asyncio
 
 
 wait_n = importlib.import_module("1-concurrent_coroutines").wait_n
