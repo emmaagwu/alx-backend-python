@@ -27,8 +27,7 @@ def stream_users_in_batches(batch_size):
                 break
             yield batch
 
-    except mysql.connector.Error as err:
-        print(f"Database error: {err}")
+    
     finally:
         # Clear any unread results (avoids "Unread result found")
         if cursor:
