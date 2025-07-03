@@ -57,56 +57,100 @@
 #                 print(user)
 
 
-#!/usr/bin/env python3
+# #!/usr/bin/env python3
+# import mysql.connector
+# from config import DB_CONFIG
+
+# def stream_users_in_batches(batch_size):
+#     """
+#     Generator that yields users in batches from the user_data table.
+#     Each batch contains up to `batch_size` user rows as a list of dicts.
+#     """
+#     connection = None
+#     cursor = None
+
+#     try:
+#         connection = mysql.connector.connect(
+#             host=DB_CONFIG["host"],
+#             user=DB_CONFIG["user"],
+#             password=DB_CONFIG["password"],
+#             database=DB_CONFIG["database"]
+#         )
+# #         cursor = connection.cursor(dictionary=True)
+#         cursor.execute("SELECT user_id, name, email, age FROM user_data")
+
+#         # Use iter to avoid explicit while loop
+#         fetch_batch = cursor.fetchmany
+#         for batch in iter(lambda: fetch_batch(batch_size), []):  # loop 1
+#             yield batch
+
+#     finally:
+#         if cursor:
+#             try:
+#                 while cursor.nextset():
+#                     pass
+#             except:
+#                 pass
+#             try:
+#                 cursor.close()
+#             except:
+#                 pass
+#         if connection and connection.is_connected():
+#             try:
+#                 connection.close()
+#             except:
+#                 pass
+
+
+# def batch_processing(batch_size):
+#     """
+#     Processes users batch by batch and prints those over age 25.
+#     """
+#     for batch in stream_users_in_batches(batch_size):  # loop 2
+#         for user in batch:  # loop 3
+#             if user["age"] > 25:
+#                 print(user)
+
+
 import mysql.connector
 from config import DB_CONFIG
 
 def stream_users_in_batches(batch_size):
     """
-    Generator that yields users in batches from the user_data table.
-    Each batch contains up to `batch_size` user rows as a list of dicts.
+    Generator that yields rows from user_data in batches.
     """
-    connection = None
-    cursor = None
-
-    try:
-        connection = mysql.connector.connect(
+    connection = mysql.connector.connect(
             host=DB_CONFIG["host"],
             user=DB_CONFIG["user"],
             password=DB_CONFIG["password"],
             database=DB_CONFIG["database"]
-        )
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute("SELECT user_id, name, email, age FROM user_data")
+    )
+    cursor = connection.cursor(dictionary=True)
 
-        # Use iter to avoid explicit while loop
-        fetch_batch = cursor.fetchmany
-        for batch in iter(lambda: fetch_batch(batch_size), []):  # loop 1
+    try:
+        cursor.execute("SELECT * FROM user_data")
+        while True:
+            batch = cursor.fetchmany(batch_size)
+            if not batch:
+                break
             yield batch
-
     finally:
-        if cursor:
-            try:
-                while cursor.nextset():
-                    pass
-            except:
-                pass
-            try:
-                cursor.close()
-            except:
-                pass
-        if connection and connection.is_connected():
-            try:
-                connection.close()
-            except:
-                pass
+        cursor.close()
+        connection.close()
 
 
 def batch_processing(batch_size):
     """
-    Processes users batch by batch and prints those over age 25.
+    Generator that yields only users over age 25 from batches.
     """
-    for batch in stream_users_in_batches(batch_size):  # loop 2
-        for user in batch:  # loop 3
-            if user["age"] > 25:
-                print(user)
+    for batch in stream_users_in_batches(batch_size):  # 1st loop
+        filtered = [user for user in batch if user['age'] > 25]  # 2nd loop
+        for user in filtered:  # 3rd loop
+            yield user
+
+    return 
+
+
+if __name__ == "__main__":
+    for user in batch_processing(batch_size=3):
+        print(user)
