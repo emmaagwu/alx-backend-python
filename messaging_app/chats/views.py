@@ -1,6 +1,5 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.permissions import BasePermission
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -23,6 +22,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticatedAndParticipant]
+    
+    # Enable filtering and pagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = MessageFilter
     pagination_class = MessagePagination
