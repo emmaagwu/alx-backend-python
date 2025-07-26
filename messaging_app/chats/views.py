@@ -1,13 +1,22 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Conversation, Message
-from .serializers import ConversationSerializer, MessageSerializer
+from .serializers import ConversationSerializer, MessageSerializer, RegisterSerializer
 from .permissions import IsAuthenticatedAndParticipant
 from .filters import MessageFilter
-from .pagination import MessagePagination
+from .pagination import CustomPagination
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+    permission_classes = []
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -26,7 +35,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     # Enable filtering and pagination
     filter_backends = [DjangoFilterBackend]
     filterset_class = MessageFilter
-    pagination_class = MessagePagination
+    pagination_class = CustomPagination
 
     def get_queryset(self):
         conversation_id = self.kwargs.get('conversation_id')
