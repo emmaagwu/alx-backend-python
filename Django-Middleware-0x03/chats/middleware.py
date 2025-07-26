@@ -82,3 +82,25 @@ class OffensiveLanguageMiddleware:
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+    
+
+class RolePermissionMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Allow unauthenticated access to login, register, admin panel etc.
+        if not request.user.is_authenticated:
+            return self.get_response(request)
+
+        # Access the user's role (assuming the role is a field on the User model or profile)
+        user_role = getattr(request.user, 'role', None)
+
+        # Check the request path – optionally apply to specific URLs only
+        protected_paths = ['/api/chat/send/', '/api/chat/delete/', '/api/admin/']  # example protected routes
+
+        if request.path in protected_paths:
+            if user_role not in ['admin', 'moderator']:
+                return HttpResponseForbidden("Access denied. Admins or Moderators only.")
+
+        return self.get_response(request)
