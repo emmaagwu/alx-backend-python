@@ -44,7 +44,12 @@ coverage.xml
 .pytest_cache/
 
 # Django
+# Ignore all .log files
 *.log
+
+# But do not ignore this specific log file
+!requests.log
+
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
