@@ -1,10 +1,14 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import BasePermission
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsAuthenticatedAndParticipant
-from django.shortcuts import get_object_or_404
+from .filters import MessageFilter
+from .pagination import MessagePagination
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -13,23 +17,22 @@ class ConversationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedAndParticipant]
 
     def get_queryset(self):
-        # Only return conversations the user is part of
         return self.queryset.filter(participants=self.request.user)
+
 
 class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticatedAndParticipant]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = MessageFilter
+    pagination_class = MessagePagination
 
     def get_queryset(self):
-        """
-        Return only messages for conversations the user participates in.
-        """
         conversation_id = self.kwargs.get('conversation_id')
         conversation = get_object_or_404(Conversation, id=conversation_id)
 
-        # Check if user is a participant
         if self.request.user not in conversation.participants.all():
-            return Message.objects.none()  # Empty queryset
+            return Message.objects.none()
 
         return Message.objects.filter(conversation=conversation)
 
@@ -37,7 +40,6 @@ class MessageViewSet(viewsets.ModelViewSet):
         conversation_id = self.kwargs.get('conversation_id')
         conversation = get_object_or_404(Conversation, id=conversation_id)
 
-        # Restrict sending messages to participants only
         if self.request.user not in conversation.participants.all():
             return Response({"detail": "Not allowed."}, status=status.HTTP_403_FORBIDDEN)
 
