@@ -1,0 +1,9 @@
+asgiref==3.9.1
+Django==5.2.4
+django-filter==25.1
+djangorestframework==3.16.0
+drf-nested-routers==0.94.2
+Markdown==3.8.2
+mysql-connector-python==9.3.0
+python-dotenv==1.1.1
+sqlparse==0.5.3
