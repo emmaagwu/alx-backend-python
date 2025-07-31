@@ -1,0 +1,12 @@
+<h2>Your Recent Messages</h2>
+
+<ul>
+  {% for msg in messages %}
+    <li>
+      <strong>{{ msg.sender.username }}</strong>: {{ msg.content }}
+      <small>{{ msg.timestamp }}</small>
+    </li>
+  {% empty %}
+    <li>No messages yet.</li>
+  {% endfor %}
+</ul>

@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib import messages
 from .models import Message
+from django.views.decorators.cache import cache_page
 
 
 
@@ -131,3 +132,25 @@ def mark_as_read(request, message_id):
         msg.read = True
         msg.save(update_fields=["read"])
     return redirect("messaging:inbox_unread")
+
+
+@login_required
+@cache_page(60)  # cache this view for 60 seconds
+def conversation_list(request):
+    """
+    Basic inbox/conversation view showing all messages involving the user,
+    cached for 60 seconds to reduce database hits.
+    """
+    user = request.user
+    # Use ORM optimization
+    messages_qs = (
+        Message.objects.filter(receiver=user)
+        .select_related("sender", "receiver", "parent_message")
+        .order_by("-timestamp")
+    )
+
+    return render(
+        request,
+        "messaging/conversation_list.html",
+        {"messages": messages_qs},
+    )

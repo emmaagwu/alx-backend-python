@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import delete_user, signup_view, inbox_unread, mark_as_read
+from .views import delete_user, signup_view, inbox_unread, mark_as_read, conversation_list
 from django.contrib.auth import views as auth_views
 
 app_name = "messaging" 
@@ -11,4 +11,5 @@ urlpatterns = [
     path("delete-account/", delete_user, name="delete_account"),
     path("inbox/unread/", inbox_unread, name="inbox_unread"),
     path("message/<int:message_id>/read/", mark_as_read, name="mark_as_read"),
+    path("conversations/", conversation_list, name="conversation_list"),
 ]
