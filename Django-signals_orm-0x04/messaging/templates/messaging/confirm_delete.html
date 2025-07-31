@@ -3,5 +3,5 @@
 <form method="post">
   {% csrf_token %}
   <button type="submit">Yes, delete my account</button>
-  <a href="{% url 'some_safe_page' %}">Cancel</a>
+  <a href="{% url 'messaging:login' %}">Cancel</a>
 </form>
