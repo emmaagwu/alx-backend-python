@@ -1,0 +1,15 @@
+<h2>Unread Messages</h2>
+<ul>
+  {% for msg in unread_messages %}
+    <li>
+      <strong>{{ msg.sender.username }}</strong>: {{ msg.content }} 
+      <small>{{ msg.timestamp }}</small>
+      <form method="post" action="{% url 'messaging:mark_as_read' msg.id %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Mark read</button>
+      </form>
+    </li>
+  {% empty %}
+    <li>No unread messages.</li>
+  {% endfor %}
+</ul>

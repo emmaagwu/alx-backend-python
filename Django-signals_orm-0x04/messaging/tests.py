@@ -64,3 +64,18 @@ class UserDeletionCleanupTestCase(TestCase):
         # deleting user_b should also remove their notifications
         self.user_b.delete()
         self.assertFalse(Notification.objects.filter(user=self.user_b).exists())
+
+class UnreadMessagesManagerTestCase(TestCase):
+    def setUp(self):
+        self.sender = User.objects.create_user(username="alice", password="pass")
+        self.receiver = User.objects.create_user(username="bob", password="pass")
+        # one read, one unread
+        Message.objects.create(sender=self.sender, receiver=self.receiver, content="Unread msg")
+        read_msg = Message.objects.create(sender=self.sender, receiver=self.receiver, content="Read msg")
+        read_msg.read = True
+        read_msg.save(update_fields=["read"])
+
+    def test_unread_manager_returns_only_unread(self):
+        unread = Message.unread.for_user(self.receiver)
+        self.assertEqual(unread.count(), 1)
+        self.assertFalse(unread.first().read)

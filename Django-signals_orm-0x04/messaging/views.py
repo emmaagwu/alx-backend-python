@@ -108,3 +108,26 @@ def thread_view(request, root_id):
         "messaging/threaded.html",
         {"thread": thread_tree, "root": root},
     )
+
+
+@login_required
+def inbox_unread(request):
+    user = request.user
+    # Use custom manager, only pull what you need: id, sender username, content, timestamp
+    unread_qs = (
+        Message.unread.for_user(user)
+        .select_related("sender")  # eager load sender to avoid extra query
+        .only("id", "content", "timestamp", "sender__username")  # minimal fields
+        .order_by("-timestamp")
+    )
+
+    return render(request, "messaging/inbox_unread.html", {"unread_messages": unread_qs})
+
+
+@login_required
+def mark_as_read(request, message_id):
+    msg = get_object_or_404(Message, pk=message_id, receiver=request.user)
+    if not msg.read:
+        msg.read = True
+        msg.save(update_fields=["read"])
+    return redirect("messaging:inbox_unread")
