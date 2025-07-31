@@ -115,7 +115,7 @@ def inbox_unread(request):
     user = request.user
     # Use custom manager, only pull what you need: id, sender username, content, timestamp
     unread_qs = (
-        Message.unread.for_user(user)
+        Message.unread.unread_for_user(user)
         .select_related("sender")  # eager load sender to avoid extra query
         .only("id", "content", "timestamp", "sender__username")  # minimal fields
         .order_by("-timestamp")
