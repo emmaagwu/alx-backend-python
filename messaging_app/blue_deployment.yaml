@@ -11,6 +11,11 @@ spec:
     matchLabels:
       app: messaging-app
       version: blue
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   template:
     metadata:
       labels:
@@ -19,7 +24,7 @@ spec:
     spec:
       containers:
       - name: messaging-app
-        image: emmaagwu/messaging_app:latest
+        image: emmaagwu/messaging_app:2.0
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
