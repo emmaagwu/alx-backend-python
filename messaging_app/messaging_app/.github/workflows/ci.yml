@@ -59,6 +59,16 @@ jobs:
         run: |
           python messaging_app/manage.py migrate --noinput
 
-      - name: Run tests
+      - name: Run flake8 linting
         run: |
-          pytest messaging_app/tests/ --ds=messaging_app.settings
+          flake8 messaging_app
+          
+      - name: Run tests with coverage
+        run: |
+          pytest messaging_app/tests/ --ds=messaging_app.settings --cov=messaging_app --cov-report=xml --cov-report=html
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov
