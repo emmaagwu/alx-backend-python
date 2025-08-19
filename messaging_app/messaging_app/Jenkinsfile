@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    environment {
+        PYTHON = '/usr/bin/python3'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/alx-backend-python.git',
+                    credentialsId: 'github-credentials'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r messaging_app/requirements.txt
+                '''
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh '''
+                . venv/bin/activate
+                pytest messaging_app/tests/ --junitxml=report.xml
+                '''
+            }
+            post {
+                always {
+                    junit 'report.xml'
+                }
+            }
+        }
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        disableConcurrentBuilds()
+    }
+}
